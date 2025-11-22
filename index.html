@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Leave Application System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-university"></i>
+                    <h1>Leave Application System</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#" class="nav-link active" data-page="dashboard">Dashboard</a></li>
+                        <li><a href="#" class="nav-link" data-page="apply" id="applyNav">Apply Leave</a></li>
+                        <li><a href="#" class="nav-link" data-page="history">Leave History</a></li>
+                        <li><a href="#" class="nav-link" data-page="profile">Profile</a></li>
+                        <li><a href="#" class="nav-link" data-page="pending" id="pendingNav" style="display: none;">Pending Approvals</a></li>
+                    </ul>
+                </nav>
+                <div class="user-info">
+                    <img id="userAvatar" src="https://ui-avatars.com/api/?name=Guest+User&background=3498db&color=fff" alt="User">
+                    <span id="userDisplayName">Guest User</span>
+                    <button id="logoutBtn" class="btn" style="display: none; margin-left: 10px;">Logout</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <!-- Login Screen (Initially shown) -->
+            <div id="loginScreen" class="login-container">
+                <div class="login-box">
+                    <h2 class="login-title">Login to System</h2>
+                    
+                    <div class="user-type-selector">
+                        <div class="user-type active" data-type="student">Student</div>
+                        <div class="user-type" data-type="admin">Admin</div>
+                    </div>
+                    
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" required>
+                        </div>
+                        
+                        <div class="form-group" id="studentRegistration">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="studentName">Full Name</label>
+                                    <input type="text" id="studentName" placeholder="Enter your full name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="studentReg">Registration No.</label>
+                                    <input type="text" id="studentReg" placeholder="Enter registration number">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="studentDepartment">Department</label>
+                                    <select id="studentDepartment">
+                                        <option value="">Select Department</option>
+                                        <option value="Computer Science">Computer Science</option>
+                                        <option value="Electrical Engineering">Electrical Engineering</option>
+                                        <option value="Mechanical Engineering">Mechanical Engineering</option>
+                                        <option value="Civil Engineering">Civil Engineering</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="studentYear">Academic Year</label>
+                                    <select id="studentYear">
+                                        <option value="">Select Year</option>
+                                        <option value="2023-2024">2023-2024</option>
+                                        <option value="2022-2023">2022-2023</option>
+                                        <option value="2021-2022">2021-2022</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn" style="width: 100%;">Login</button>
+                    </form>
+                    
+                    <div class="admin-only" style="margin-top: 1rem;">
+                        <p><i class="fas fa-info-circle"></i> <strong>Admin Access Required</strong> for approving/rejecting leave applications</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Application Content (Initially hidden) -->
+            <div id="appContent" style="display: none;">
+                <!-- Dashboard Page -->
+                <div id="dashboardPage" class="page-content active">
+                    <div class="dashboard">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">Leave Balance</div>
+                                <div class="card-icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                            </div>
+                            <div class="stats" id="leaveBalance">12 Days</div>
+                            <p>Remaining for this semester</p>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">Pending Applications</div>
+                                <div class="card-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                            </div>
+                            <div class="stats" id="pendingCount">0</div>
+                            <p>Waiting for approval</p>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title">Approved Leaves</div>
+                                <div class="card-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                            </div>
+                            <div class="stats" id="approvedCount">0</div>
+                            <p>This academic year</p>
+                        </div>
+                    </div>
+                    
+                    <h2 class="section-title">Recent Applications</h2>
+                    <div id="recentApplicationsContainer">
+                        <!-- Recent applications will be populated here -->
+                    </div>
+                </div>
+                
+                <!-- Apply Leave Page -->
+                <div id="applyPage" class="page-content">
+                    <div id="adminApplyMessage" class="admin-message" style="display: none;">
+                        <i class="fas fa-user-shield"></i>
+                        <h3>Administrator Access</h3>
+                        <p>As an administrator, you cannot apply for leave. This feature is available only for students.</p>
+                        <p>Use the <strong>Pending Approvals</strong> section to review and process student leave applications.</p>
+                    </div>
+                    
+                    <div id="studentApplyForm">
+                        <h2 class="section-title">Apply for Leave</h2>
+                        
+                        <form id="leaveForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="leaveType">Leave Type</label>
+                                    <select id="leaveType" required>
+                                        <option value="">Select Leave Type</option>
+                                        <option value="Medical Leave">Medical Leave</option>
+                                        <option value="Personal Leave">Personal Leave</option>
+                                        <option value="Emergency Leave">Emergency Leave</option>
+                                        <option value="Academic Leave">Academic Leave</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="studentId">Student ID</label>
+                                    <input type="text" id="studentId" readonly>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="studentFullName">Student Name</label>
+                                    <input type="text" id="studentFullName" readonly>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="studentRegNo">Registration No.</label>
+                                    <input type="text" id="studentRegNo" readonly>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="fromDate">From Date</label>
+                                    <input type="date" id="fromDate" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="toDate">To Date</label>
+                                    <input type="date" id="toDate" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="reason">Reason for Leave</label>
+                                <textarea id="reason" rows="5" placeholder="Please provide a detailed reason for your leave application..." required></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="documents">Supporting Documents (if any)</label>
+                                <input type="file" id="documents">
+                            </div>
+                            
+                            <button type="submit" class="btn">Submit Application</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Leave History Page -->
+                <div id="historyPage" class="page-content">
+                    <h2 class="section-title">Leave History</h2>
+                    
+                    <div id="leaveHistoryContainer">
+                        <!-- Leave history will be populated here -->
+                    </div>
+                </div>
+                
+                <!-- Profile Page -->
+                <div id="profilePage" class="page-content">
+                    <h2 class="section-title">User Profile</h2>
+                    
+                    <div class="profile-section">
+                        <div class="profile-card">
+                            <div class="profile-header">
+                                <img id="profileAvatar" class="profile-img" src="https://ui-avatars.com/api/?name=Guest+User&background=3498db&color=fff" alt="Profile">
+                                <div class="profile-info">
+                                    <h3 id="profileName">Guest User</h3>
+                                    <p id="profileRole">Student</p>
+                                </div>
+                            </div>
+                            
+                            <div class="profile-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">User ID:</span>
+                                    <span id="profileUserId">STU000000</span>
+                                </div>
+                                <div class="detail-item" id="profileRegItem">
+                                    <span class="detail-label">Registration No:</span>
+                                    <span id="profileRegNo">REG000000</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Department:</span>
+                                    <span id="profileDepartment">Computer Science</span>
+                                </div>
+                                <div class="detail-item" id="profileAdvisorItem">
+                                    <span class="detail-label">Class Advisor:</span>
+                                    <span id="profileAdvisor">Dr. Smith</span>
+                                </div>
+                                <div class="detail-item" id="profileLeaveItem">
+                                    <span class="detail-label">Leave Balance:</span>
+                                    <span id="profileLeaveBalance">12 days</span>
+                                </div>
+                                <div class="detail-item" id="profileYearItem">
+                                    <span class="detail-label">Academic Year:</span>
+                                    <span id="profileYear">2023-2024</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-card">
+                            <h3 class="card-title">Quick Stats</h3>
+                            <div class="stats-container">
+                                <div class="stat-item">
+                                    <span class="stat-label">Total Applications:</span>
+                                    <span class="stat-value" id="totalApplications">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Approved Leaves:</span>
+                                    <span class="stat-value" id="profileApproved">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Pending Applications:</span>
+                                    <span class="stat-value" id="profilePending">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Rejected Applications:</span>
+                                    <span class="stat-value" id="profileRejected">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pending Approvals Page (Admin Only) -->
+                <div id="pendingPage" class="page-content">
+                    <h2 class="section-title">Pending Approvals</h2>
+                    
+                    <div id="pendingApprovalsContainer">
+                        <!-- Pending approvals will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 Student Leave Application System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Application Details Modal -->
+    <div class="modal" id="detailsModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Leave Application Details</h2>
+            <div id="modalContent">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span id="notificationText">Notification message</span>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
